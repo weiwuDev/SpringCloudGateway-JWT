@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
@@ -27,22 +28,25 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String accessToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            accessToken = accessToken.substring(7);
-            Claims claims = jwtUtil.getAllClaimsFromToken(accessToken);
-            List<String> rolesMap = claims.get("roles", List.class);
+            if(accessToken != null) {
+                    accessToken = accessToken.substring(7);
+                    Claims claims = jwtUtil.getAllClaimsFromToken(accessToken);
+                    List<String> rolesMap = claims.get("roles", List.class);
 
-            StringBuilder roles = new StringBuilder();
-            String separator = "";
-            for (String role : rolesMap) {
-                roles.append(separator);
-                separator = ":";
-                roles.append(role);
+                    StringBuilder roles = new StringBuilder();
+                    String separator = "";
+                    for (String role : rolesMap) {
+                        roles.append(separator);
+                        separator = ":";
+                        roles.append(role);
+                    }
+
+                    ServerHttpRequest modifiedRequest = request.mutate().header("USER_DETAILS", claims.getSubject())
+                            .header("USER_ROLES", roles.toString()).build();
+
+                    return chain.filter(exchange.mutate().request(modifiedRequest).build());
             }
-
-            ServerHttpRequest modifiedRequest = request.mutate().header("USER_DETAILS", claims.getSubject())
-                    .header("USER_ROLES", roles.toString()).build();
-
-            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+            return chain.filter(exchange);
         };
     }
 

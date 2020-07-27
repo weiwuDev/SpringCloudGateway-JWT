@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: ${app_name:SpringCloudGateway}
+  profiles:
+    active: ${active_profile}
+
+  cloud:
+    config:
+      uri: ${config_uri:http://localhost:8888}
+      username: ${spring_config_security_username}
+      password: ${spring_config_security_password}

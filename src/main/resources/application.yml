@@ -1,0 +1,68 @@
+spring:
+
+  rabbitmq:
+    host: ${rabbitmq_host:localhost}
+    port: ${rabbitmq_port:5672}
+    username: ${rabbitmq_user:guest}
+    password: ${rabbitmq_pass:guest}
+
+  cloud:
+    bus:
+      enabled: ${cloud_bus:true}
+      refresh:
+        enabled: ${cloud_bus_refresh:true}
+      id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+
+    gateway:
+      default-filters:
+         - name: CustomFilter
+         - name: CustomFilterTwo
+      routes:
+        - id: AuthService
+          uri: http://localhost:8091
+          predicates:
+            - Path=/AuthService/**
+          filters:
+            - StripPrefix=1
+           # - SaveSession
+        - id: RegistrationService
+          uri: http://localhost:8093
+          predicates:
+            - Path=/RegistrationService/**
+          filters:
+            - StripPrefix=1
+            # - SaveSession
+        - id: UserService
+          uri: http://localhost:8084
+          predicates:
+            - Path=/UserService/**
+          filters:
+            - StripPrefix=1
+            # - SaveSession
+
+server:
+  port: ${customePort:8443}
+  ssl:
+    enabled: ${ssl_enabled:true}
+    key-store: ${key_store_path:classpath:keystore.p12}
+    key-store-type: ${key_type}
+    key-alias: ${key_alias}
+    key-store-password: ${key_password}
+
+
+eureka:
+  client:
+    registerWithEureka: ${registerWithEureka:true}
+    fetchRegistry: ${fetchRegistry:true}
+    service-url:
+      defaultZone:  ${eureka_url:http://localhost:8761/eureka/}
+
+  instance:
+    hostname: ${HOSTNAME:${spring.application.name}}
+    preferIpAddress: ${preferIpAddress:false}
+    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}:${server.port}
+
+
+springboot-webflux-jwt:
+  jwt:
+    secret: ${jwt_secret}

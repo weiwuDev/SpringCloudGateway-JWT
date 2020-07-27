@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
-                .pathMatchers("/AuthService/login", "/checkno", "/AuthService/logout", "/RegistrationService/register", "/RegistrationService/check", "/AuthService/check").permitAll()
+                .pathMatchers("/AuthService/login", "/checkno", "/AuthService/logout", "/RegistrationService/register", "/RegistrationService/check", "/AuthService/check", "/AuthService/checkno").permitAll()
                 .pathMatchers("/check").authenticated()
                 .anyExchange().authenticated()
                 .and()

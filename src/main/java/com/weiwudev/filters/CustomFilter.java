@@ -41,7 +41,7 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
                         roles.append(role);
                     }
 
-                    ServerHttpRequest modifiedRequest = request.mutate().header("USER_DETAILS", claims.getSubject())
+                    ServerHttpRequest modifiedRequest = request.mutate().header("USER_NAME", claims.getSubject())
                             .header("USER_ROLES", roles.toString()).build();
 
                     return chain.filter(exchange.mutate().request(modifiedRequest).build());

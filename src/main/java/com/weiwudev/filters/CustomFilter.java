@@ -28,7 +28,7 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String accessToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            if(accessToken != null) {
+            if(accessToken != null && accessToken.startsWith("Bearer ")) {
                     accessToken = accessToken.substring(7);
                     Claims claims = jwtUtil.getAllClaimsFromToken(accessToken);
                     List<String> rolesMap = claims.get("roles", List.class);

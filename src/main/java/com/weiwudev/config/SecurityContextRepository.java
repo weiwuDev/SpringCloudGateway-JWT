@@ -2,6 +2,8 @@ package com.weiwudev.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,8 +33,8 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String authToken = authHeader.substring(7);
             Authentication auth = new UsernamePasswordAuthenticationToken(authToken, authToken);
-            return this.authenticationManager.authenticate(auth).map(authentication -> {
-                return new SecurityContextImpl(authentication);
+            return this.authenticationManager.authenticate(auth).flatMap(authentication -> {
+                return Mono.justOrEmpty(new SecurityContextImpl(authentication));
             });
         } else {
             return Mono.empty();

@@ -1,5 +1,6 @@
 package com.weiwudev.config;
 
+import com.weiwudev.filters.CustomFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -24,12 +24,12 @@ public class SecurityConfig {
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
                 .pathMatchers("/AuthService/register").hasAuthority("ROLE_SYSTEM")
+                .pathMatchers("/UserService/**").hasAuthority("ROLE_USER")
                 .pathMatchers("/AuthService/**", "/checkno", "/AuthService/logout", "/RegistrationService/register", "/RegistrationService/check", "/AuthService/check", "/AuthService/checkno").permitAll()
                 .pathMatchers("/check").authenticated()
                 .anyExchange().authenticated()
                 .and()
                 .httpBasic().disable()
-                .formLogin().disable()
                 .csrf().disable()
                 .cors().and()
                 .build();

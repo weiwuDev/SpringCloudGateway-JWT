@@ -4,6 +4,7 @@ import com.weiwudev.filters.CustomFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -23,6 +24,7 @@ public class SecurityConfig {
                 .authenticationManager(authenticationManager)
                 .securityContextRepository(securityContextRepository)
                 .authorizeExchange()
+                .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .pathMatchers("/AuthService/register").hasAuthority("ROLE_SYSTEM")
                 .pathMatchers("/UserService/**").hasAuthority("ROLE_USER")
                 .pathMatchers("/AuthService/**", "/checkno", "/AuthService/logout", "/RegistrationService/register", "/RegistrationService/check", "/AuthService/check", "/AuthService/checkno").permitAll()
@@ -30,8 +32,8 @@ public class SecurityConfig {
                 .anyExchange().authenticated()
                 .and()
                 .httpBasic().disable()
-                .csrf().disable()
                 .cors().and()
+                .csrf().disable()
                 .build();
 
     }

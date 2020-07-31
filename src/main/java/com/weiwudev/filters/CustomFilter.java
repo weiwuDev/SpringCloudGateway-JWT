@@ -26,9 +26,10 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
     public GatewayFilter apply(Config config) {
 
         return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
-            String accessToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-            if(accessToken != null && accessToken.startsWith("Bearer ")) {
+            try {
+                ServerHttpRequest request = exchange.getRequest();
+                String accessToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+                if (accessToken != null && accessToken.startsWith("Bearer ")) {
                     accessToken = accessToken.substring(7);
                     Claims claims = jwtUtil.getAllClaimsFromToken(accessToken);
                     List<String> rolesMap = claims.get("roles", List.class);
@@ -45,6 +46,9 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
                             .header("USER_ROLES", roles.toString()).build();
 
                     return chain.filter(exchange.mutate().request(modifiedRequest).build());
+                }
+            }catch (Exception e){
+                return chain.filter(exchange);
             }
             return chain.filter(exchange);
         };
